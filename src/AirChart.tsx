@@ -9,7 +9,9 @@ import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 
-type Props = {};
+type Props = {
+  binningValue: string
+};
 
 const { REACT_APP_AIR_DATA_ENDPOINT: airEndpoint } = process.env;
 
@@ -31,6 +33,7 @@ const defaultColumns = [
 ].filter((n) => !n.match(/(baseline|timestamp|raw)/));
 
 type StatRow = [
+
   number /* abs_humid */,
   number /* co2 */,
   number /* co2_est */,
@@ -57,7 +60,7 @@ const asSeries = (
   }));
 };
 
-export const AirChart: React.FC<Props> = (props) => {
+export const AirChart: React.FC<Props> = ({ binningValue }) => {
   const [colState, setColumns] = React.useState<Record<string, boolean>>(
     defaultColumns.reduce((acc, c) => ({ ...acc, [c]: !!c.match(/score/) }), {})
   );
@@ -71,11 +74,11 @@ export const AirChart: React.FC<Props> = (props) => {
 
   const [data, setData] = React.useState<null | string | StatRow[]>(null);
   useEffect(() => {
-    fetch(airEndpoint!)
+    fetch(`${airEndpoint!}?binningValue=${binningValue}`)
       .then((t) => t.json())
       .then((data) => setData(data))
       .catch((err) => setData(err.message));
-  }, []);
+  }, [binningValue]);
   if (typeof data === "string") return <h1>{data}</h1>;
   if (!data) return <h1>Loading</h1>;
   return (
