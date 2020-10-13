@@ -10,7 +10,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 
 type Props = {
-  binningValue: string
+  binningValue: string;
 };
 
 const { REACT_APP_AIR_DATA_ENDPOINT: airEndpoint } = process.env;
@@ -33,7 +33,6 @@ const defaultColumns = [
 ].filter((n) => !n.match(/(baseline|timestamp|raw)/));
 
 type StatRow = [
-
   number /* abs_humid */,
   number /* co2 */,
   number /* co2_est */,
@@ -50,23 +49,23 @@ type StatRow = [
   number /* voc_h2_raw */
 ];
 
-const asSeries = (
-  data: StatRow[],
-  columns: string[]
-): { name: string; data: any[] }[] => {
-  return columns.map((name, i) => ({
-    name,
-    data: data.map((row) => [row[9], row[i]]),
-  }));
-};
+type Series = { name: string; data: any[] };
+
+const asSeries = (data: StatRow[], colEntries: [string, boolean][]): Series[] =>
+  colEntries.reduce((acc, [name, isVisible], i) => {
+    if (!isVisible) return acc;
+    return [
+      ...acc,
+      {
+        name,
+        data: data.map((row) => [row[9], row[i]]),
+      },
+    ];
+  }, [] as Series[]);
 
 export const AirChart: React.FC<Props> = ({ binningValue }) => {
   const [colState, setColumns] = React.useState<Record<string, boolean>>(
     defaultColumns.reduce((acc, c) => ({ ...acc, [c]: !!c.match(/score/) }), {})
-  );
-  const chartColumns = Object.entries(colState).reduce(
-    (acc, [colName, isActivated]) => (isActivated ? [...acc, colName] : acc),
-    [] as string[]
   );
   const onColumnToggled = (event: any) => {
     setColumns({ ...colState, [event.target.name]: event.target.checked });
@@ -81,6 +80,7 @@ export const AirChart: React.FC<Props> = ({ binningValue }) => {
   }, [binningValue]);
   if (typeof data === "string") return <h1>{data}</h1>;
   if (!data) return <h1>Loading</h1>;
+  const colEntries = Object.entries(colState);
   return (
     <>
       <Chart
@@ -96,12 +96,12 @@ export const AirChart: React.FC<Props> = ({ binningValue }) => {
             type: "datetime",
           },
         }}
-        series={asSeries(data, chartColumns)}
+        series={asSeries(data, colEntries)}
       />
       <FormControl component="fieldset">
         <FormLabel component="legend">Toggle columns</FormLabel>
         <FormGroup>
-          {Object.entries(colState).map(([colName, isActivated]) => (
+          {colEntries.map(([colName, isActivated]) => (
             <FormControlLabel
               key={colName}
               control={

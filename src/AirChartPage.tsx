@@ -5,8 +5,8 @@ import { AirChartBinningControl } from "./AirChartBinningControl";
 import { useQuery } from "./QueryContext";
 
 export const AirChartPage: React.FC = () => {
-  const [binningValue, setBinningValue] = React.useState("hour")
-  const chart = <AirChart binningValue={binningValue} />
+  const [binningValue, setBinningValue] = React.useState("hour");
+  const chart = <AirChart binningValue={binningValue} />;
   if (useQuery().focusMode) return chart;
   return (
     <>
@@ -15,7 +15,7 @@ export const AirChartPage: React.FC = () => {
       <AirChartBinningControl
         options={["minute", "hour", "day"]}
         value={binningValue}
-        onSelect={evt => setBinningValue(evt.currentTarget.value!)}
+        onSelect={(evt) => setBinningValue(evt.currentTarget.value!)}
       />
     </>
   );
