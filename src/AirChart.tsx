@@ -10,7 +10,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 
 type Props = {
-  binningValue: string
+  binningValue: string;
 };
 
 const { REACT_APP_AIR_DATA_ENDPOINT: airEndpoint } = process.env;
@@ -33,7 +33,6 @@ const defaultColumns = [
 ].filter((n) => !n.match(/(baseline|timestamp|raw)/));
 
 type StatRow = [
-
   number /* abs_humid */,
   number /* co2 */,
   number /* co2_est */,
@@ -74,7 +73,7 @@ export const AirChart: React.FC<Props> = ({ binningValue }) => {
 
   const [data, setData] = React.useState<null | string | StatRow[]>(null);
   useEffect(() => {
-    fetch(`${airEndpoint!}?binningValue=${binningValue}`)
+    fetch(`${airEndpoint!}?binningValue=${binningValue}`, {})
       .then((t) => t.json())
       .then((data) => setData(data))
       .catch((err) => setData(err.message));
