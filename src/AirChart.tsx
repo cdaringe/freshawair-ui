@@ -73,7 +73,7 @@ export const AirChart: React.FC<Props> = ({ binningValue }) => {
 
   const [data, setData] = React.useState<null | string | StatRow[]>(null);
   useEffect(() => {
-    fetch(`${airEndpoint!}?binningValue=${binningValue}`)
+    fetch(`${airEndpoint!}?binningValue=${binningValue}`, {})
       .then((t) => t.json())
       .then((data) => setData(data))
       .catch((err) => setData(err.message));
